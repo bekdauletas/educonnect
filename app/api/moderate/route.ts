@@ -5,14 +5,30 @@ export async function POST(req: NextRequest) {
 
   try {
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite-preview:generateContent?key=${process.env.GEMINI_API_KEY}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{
             parts: [{
-              text: `Ты модератор школьного чата. Проверь это сообщение на агрессию, грубость, оскорбления или неуважение. Ответь только "SAFE" если сообщение нормальное, или "UNSAFE" если содержит недопустимый контент. Сообщение: "${text}"`
+              text: `Ты строгий модератор школьного чата между учителями и родителями. Проверь это сообщение на:
+- Грубость, оскорбления, мат
+- Угрозы, агрессию, токсичность
+- Неуважение к учителям или другим родителям
+- Сексуальный контент, аморальные темы
+- Политику, экстремизм, дискриминацию
+- Спам, рекламу
+
+ВАЖНО: Школьный чат должен быть МАКСИМАЛЬНО уважительным и профессиональным.
+
+Сообщение: "${text}"
+
+Ответь ТОЛЬКО одним словом:
+- "SAFE" если сообщение корректное и уважительное
+- "UNSAFE" если есть хоть малейшее нарушение
+
+Ответ:`
             }]
           }]
         })
@@ -21,10 +37,12 @@ export async function POST(req: NextRequest) {
 
     const data = await response.json()
     const result = data.candidates?.[0]?.content?.parts?.[0]?.text || 'SAFE'
-    const isSafe = !result.includes('UNSAFE')
+    const isSafe = result.trim().toUpperCase().includes('SAFE') && !result.trim().toUpperCase().includes('UNSAFE')
 
-    return NextResponse.json({ isSafe })
-  } catch {
-    return NextResponse.json({ isSafe: true })
+    return NextResponse.json({ isSafe, reason: result })
+  } catch (error) {
+    console.error('Gemini API error:', error)
+    // В случае ошибки API — блокируем на всякий случай
+    return NextResponse.json({ isSafe: false, reason: 'API error' })
   }
 }

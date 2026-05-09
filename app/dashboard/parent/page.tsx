@@ -261,6 +261,7 @@ export default function ParentDashboard() {
           <button key={tab.key} onClick={() => {
             setActiveTab(tab.key)
             if (tab.key === 'settings') logout()
+            if (tab.key === 'chats') router.push('/chat')
           }} style={{
             flex: 1, display: 'flex', flexDirection: 'column',
             alignItems: 'center', gap: '3px',
