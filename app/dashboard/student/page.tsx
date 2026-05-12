@@ -83,6 +83,7 @@ export default function StudentDashboard() {
 
   const tabs: { key: Tab; icon: string; label: string }[] = [
     { key: 'home', icon: '⊞', label: lang === 'kz' ? 'Басты' : 'Главная' },
+    { key: 'chats', icon: '💬', label: lang === 'kz' ? 'Чат' : 'Чат' },
     { key: 'tasks', icon: '☰', label: lang === 'kz' ? 'Тапсырмалар' : 'Задания' },
     { key: 'settings', icon: '⚙', label: lang === 'kz' ? 'Баптаулар' : 'Настройки' },
   ]
@@ -283,7 +284,7 @@ export default function StudentDashboard() {
           <button key={tab.key} onClick={() => {
             setActiveTab(tab.key)
             if (tab.key === 'settings') logout()
-            if (tab.key === 'chats') router.push('/chat')
+            if (tab.key === 'chats') router.push('/student-chat')
           }} style={{
             flex: 1, display: 'flex', flexDirection: 'column',
             alignItems: 'center', gap: '3px',
